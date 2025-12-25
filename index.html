@@ -642,6 +642,20 @@
 
           populateFilters(allSites);
           displaySites(allSites);
+          // ✅ إصلاح الخريطة من أول فتح (قبل أي فلترة)
+setTimeout(() => {
+  if (!map) return;
+  map.invalidateSize();
+
+  // إعادة ضبط الحدود بشكل مضبوط أيضاً (وبحد تكبير)
+  if (markers.length === 1) {
+    map.setView(markers[0].getLatLng(), 15);
+  } else if (markers.length > 1) {
+    const group = L.featureGroup(markers);
+    map.fitBounds(group.getBounds(), { padding: [30, 30], maxZoom: 16 });
+  }
+}, 350);
+
         })
         .catch(err => {
           console.error('خطأ في تحميل البيانات:', err);
