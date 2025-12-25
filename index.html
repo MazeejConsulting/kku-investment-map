@@ -673,7 +673,12 @@ const redIcon = new L.Icon({
           popupContent += '<p><strong>الاحداثيات:</strong> ' + coordsValue + '</p>';
           popupContent += '</div>';
 
-          const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupContent);
+const status = (d['حالة العقد'] ?? '').toString().trim();
+
+const marker = L.marker(
+  [lat, lon],
+  status === 'منتهي' ? { icon: redIcon } : {}
+).addTo(map).bindPopup(popupContent);
           markers.push(marker);
         }
 
