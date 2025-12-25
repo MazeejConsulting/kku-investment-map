@@ -238,19 +238,25 @@
     .footer a{ color:#1a5f3f; text-decoration:none; font-weight:bold; }
     .footer a:hover{ text-decoration:underline; }
 
-    /* ✅ الجوال: إحصائيات+فلاتر ثم الخريطة، بدون قائمة */
     @media (max-width: 768px){
       body{ height:auto; overflow:auto; }
-      .container{ height:auto; overflow:visible; }
+      .container{ overflow:visible; }
       .content{ flex-direction:column; overflow:visible; }
 
       .header{ flex-direction:column; gap:10px; }
       .header-content h1{ font-size:20px; }
 
-      
-      .map-container{ order:2; height:65vh; min-height:380px; }
-      #map{ height:100%; min-height:380px; }
+      .sidebar{
+        width:100%;
+        max-height:none;
+        border-left:none;
+        border-top:1px solid #ddd;
+        order:1;
+      }
+      .map-container{ order:2; height:60vh; min-height:330px; }
+      #map{ height:100%; min-height:330px; }
 
+      .sidebar h2{ display:none; }
       #locationsList{ display:none; }
 
       .footer{ flex-direction:column; text-align:center; }
