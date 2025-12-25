@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفع ملف Excel - الخارطة الاستثمارية</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a5f3f 0%, #2d8659 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        h1 {
+            color: #1a5f3f;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .upload-section {
+            margin: 30px 0;
+        }
+        
+        .upload-box {
+            border: 2px dashed #2d8659;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-box:hover {
+            background-color: #e8f5e9;
+            border-color: #1a5f3f;
+        }
+        
+        .upload-box.dragover {
+            background-color: #e8f5e9;
+            border-color: #1a5f3f;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text strong {
+            color: #1a5f3f;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1a5f3f 0%, #2d8659 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 95, 63, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.success {
+            background-color: #e8f5e9;
+            color: #1a5f3f;
+            border: 1px solid #2d8659;
+            display: block;
+        }
+        
+        .message.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef5350;
+            display: block;
+        }
+        
+        .message.info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #42a5f5;
+            display: block;
+        }
+        
+        .file-info {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .info-box {
+            background-color: #f9f9f9;
+            border-left: 4px solid #2d8659;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            color: #1a5f3f;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2d8659;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="logo.svg" alt="شعار جامعة الملك خالد">
+            </div>
+            <h1>الخارطة الاستثمارية</h1>
+            <p class="subtitle">رفع ملف Excel وعرض البيانات على الخريطة</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">
+                    اسحب ملف Excel هنا أو <strong>انقر للاختيار</strong>
+                </div>
+                <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                    (.xlsx أو .xls)
+                </div>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls">
+        </div>
+        
+        <div class="file-info" id="fileInfo">
+            <strong>الملف المختار:</strong> <span id="fileName"></span>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>جاري معالجة الملف...</div>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="button-group">
+            <button class="btn-primary" id="btnProcess">استيراد وعرض على الخريطة</button>
+        </div>
+        
+  
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadBox = document.getElementById('uploadBox');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+        const btnProcess = document.getElementById('btnProcess');
+        
+        let selectedFile = null;
+        
+        uploadBox.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                fileName.textContent = file.name;
+                fileInfo.classList.add('show');
+                showMessage('تم اختيار الملف بنجاح. اضغط "استيراد وعرض على الخريطة"', 'success');
+            }
+        });
+        
+        uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.classList.add('dragover');
+        });
+        
+        uploadBox.addEventListener('dragleave', () => {
+            uploadBox.classList.remove('dragover');
+        });
+        
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+                selectedFile = file;
+                fileName.textContent = file.name;
+                fileInfo.classList.add('show');
+                showMessage('تم اختيار الملف بنجاح. اضغط "استيراد وعرض على الخريطة"', 'success');
+            } else {
+                showMessage('الرجاء اختيار ملف Excel صحيح (.xlsx أو .xls)', 'error');
+            }
+        });
+        
+        function toNum(v) {
+            if (v === null || v === undefined) return NaN;
+            if (typeof v === 'number') return v;
+            const s = String(v).trim().replace(/,/g, '.').replace(/\u00A0/g, '');
+            const n = parseFloat(s);
+            return isNaN(n) ? NaN : n;
+        }
+        
+        function findByHeader(headers, patterns) {
+            const ps = patterns.map(p => p.toLowerCase());
+            for (let i = 0; i < headers.length; i++) {
+                const h = String(headers[i] || '').toLowerCase();
+                for (const p of ps) if (h.includes(p)) return i;
+            }
+            return -1;
+        }
+        
+        function sheetToSites(sheet) {
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+            if (!rows || rows.length < 2) return [];
+            
+            const headers = rows[0].map(h => String(h || '').trim());
+            const dataRows = rows.slice(1);
+            
+            // البحث عن الأعمدة المطلوبة
+            let latIdx = findByHeader(headers, ['خط العرض (latitude)', 'خط العرض', 'latitude', 'lat', 'شمال']);
+            let lonIdx = findByHeader(headers, ['خط الطول (longitude)', 'خط الطول', 'longitude', 'lon', 'lng', 'شرق']);
+            
+            // الحقول الجديدة المطلوبة
+            let fileNumIdx = findByHeader(headers, ['رقم الملف خاص مزيج', 'رقم الملف', 'file number']); // العمود D
+            let contractStatusIdx = findByHeader(headers, ['حالة العقد', 'contract status', 'status']); // العمود K
+            let sourceLocationIdx = findByHeader(headers, ['الموقع حسب المصدر', 'موقع المصدر']); // العمود O
+            let buildingIdx = findByHeader(headers, ['المبنى حسب المصدر', 'المبنى']); // العمود P
+            let geoLocationIdx = findByHeader(headers, ['الموقع الجغرافي', 'geographic location']); // العمود Q
+            
+            // الحقول الإضافية للبطاقة
+            let activityIdx = findByHeader(headers, ['النشاط', 'النشاط الرئيسي', 'activity']);
+            let investorIdx = findByHeader(headers, ['اسم المستثمر', 'المستثمر', 'investor name', 'investor']);
+            let annualFeeIdx = findByHeader(headers, ['الأجرة السنوية (شامل القيمة المضافة وشامل مصاريف الماء والكهرباء)', 'الأجرة السنوية', 'annual fee', 'fee']);
+            
+            const sites = [];
+            for (let r = 0; r < dataRows.length; r++) {
+                const row = dataRows[r];
+                if (!row) continue;
+                
+                let lat = latIdx !== -1 ? toNum(row[latIdx]) : NaN;
+                let lon = lonIdx !== -1 ? toNum(row[lonIdx]) : NaN;
+                
+                // استخراج الحقول المطلوبة
+                const details = {};
+                
+                // رقم الملف (العمود D)
+                if (fileNumIdx !== -1) {
+                    const value = row[fileNumIdx] !== undefined && row[fileNumIdx] !== null ? String(row[fileNumIdx]).trim() : '';
+                    details['رقم الملف'] = value || 'غير محدد';
+                } else {
+                    details['رقم الملف'] = 'غير محدد';
+                }
+                
+                // النشاط
+                if (activityIdx !== -1) {
+                    const value = row[activityIdx] !== undefined && row[activityIdx] !== null ? String(row[activityIdx]).trim() : '';
+                    details['النشاط'] = value || 'غير محدد';
+                } else {
+                    details['النشاط'] = 'غير محدد';
+                }
+                
+                // الموقع حسب المصدر (العمود O)
+                if (sourceLocationIdx !== -1) {
+                    const value = row[sourceLocationIdx] !== undefined && row[sourceLocationIdx] !== null ? String(row[sourceLocationIdx]).trim() : '';
+                    details['الموقع حسب المصدر'] = value || 'غير محدد';
+                } else {
+                    details['الموقع حسب المصدر'] = 'غير محدد';
+                }
+                
+                // المبنى (العمود P)
+                if (buildingIdx !== -1) {
+                    const value = row[buildingIdx] !== undefined && row[buildingIdx] !== null ? String(row[buildingIdx]).trim() : '';
+                    details['المبنى'] = value || 'غير محدد';
+                } else {
+                    details['المبنى'] = 'غير محدد';
+                }
+                
+                // المستثمر
+                if (investorIdx !== -1) {
+                    const value = row[investorIdx] !== undefined && row[investorIdx] !== null ? String(row[investorIdx]).trim() : '';
+                    details['المستثمر'] = value || 'غير محدد';
+                } else {
+                    details['المستثمر'] = 'غير محدد';
+                }
+                
+                // الأجرة السنوية
+                if (annualFeeIdx !== -1) {
+                    const value = row[annualFeeIdx] !== undefined && row[annualFeeIdx] !== null ? String(row[annualFeeIdx]).trim() : '';
+                    details['الأجرة السنوية'] = value || 'غير محدد';
+                } else {
+                    details['الأجرة السنوية'] = 'غير محدد';
+                }
+                
+                // حالة العقد (العمود K)
+                if (contractStatusIdx !== -1) {
+                    const value = row[contractStatusIdx] !== undefined && row[contractStatusIdx] !== null ? String(row[contractStatusIdx]).trim() : '';
+                    details['حالة العقد'] = value || 'غير محدد';
+                } else {
+                    details['حالة العقد'] = 'غير محدد';
+                }
+                
+                // الموقع الجغرافي (العمود Q)
+                if (geoLocationIdx !== -1) {
+                    const value = row[geoLocationIdx] !== undefined && row[geoLocationIdx] !== null ? String(row[geoLocationIdx]).trim() : '';
+                    details['الموقع الجغرافي'] = value || 'غير محدد';
+                } else {
+                    details['الموقع الجغرافي'] = 'غير محدد';
+                }
+                
+                // حفظ جميع المواقع، بغض النظر عن وجود إحداثيات
+                const hasCoordinates = !isNaN(lat) && !isNaN(lon) && lat >= 15 && lat <= 35 && lon >= 30 && lon <= 55;
+                
+                sites.push({
+                    id: sites.length + 1,
+                    description: details['النشاط'] || `موقع رقم ${r + 1}`,
+                    lat: hasCoordinates ? lat : null,
+                    lon: hasCoordinates ? lon : null,
+                    hasCoordinates: hasCoordinates,
+                    details: details
+                });
+            }
+            return sites;
+        }
+        
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'message ' + type;
+        }
+        
+        btnProcess.addEventListener('click', () => {
+            if (!selectedFile) {
+                showMessage('الرجاء اختيار ملف Excel أولاً', 'error');
+                return;
+            }
+            
+            loading.style.display = 'block';
+            btnProcess.disabled = true;
+            message.style.display = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
+                    
+                    // قراءة ورقة الأساس فقط
+                    if (!wb.SheetNames.includes('الأساس')) {
+                        loading.style.display = 'none';
+                        btnProcess.disabled = false;
+                        showMessage('خطأ: لم يتم العثور على ورقة "الأساس" في الملف', 'error');
+                        return;
+                    }
+                    
+                    const sheet = wb.Sheets['الأساس'];
+                    const sites = sheetToSites(sheet);
+                    
+                    if (!sites.length) {
+                        loading.style.display = 'none';
+                        btnProcess.disabled = false;
+                        showMessage('لا توجد مواقع صالحة في ورقة الأساس', 'error');
+                        return;
+                    }
+                    
+                    localStorage.setItem('investmentSites', JSON.stringify(sites));
+                    showMessage(`تم استيراد ${sites.length} موقع بنجاح. سيتم الانتقال إلى الخريطة...`, 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } catch (err) {
+                    loading.style.display = 'none';
+                    btnProcess.disabled = false;
+                    showMessage('خطأ في قراءة الملف: ' + err.message, 'error');
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(selectedFile);
+        });
+    </script>
+</body>
+</html>
