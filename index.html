@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!--  العنوانين  . -->
+  <!-- ✅ العنوانين حسب طلبك -->
   <title>الخارطة الاستثمارية للعقود الاستثمارية</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -21,6 +21,7 @@
       flex-direction:column;
     }
 
+    /* ✅ يخلي المساحة محسوبة بدقة بين الهيدر والفوتر */
     .container{
       height:100vh;
       display:flex;
@@ -28,6 +29,7 @@
       overflow:hidden;
     }
 
+    /* ====== HEADER (نفس تصميمك) ====== */
     .header{
       background: linear-gradient(135deg, #1a5f3f 0%, #a5b9b0 100%);
       color:#fff;
@@ -45,6 +47,7 @@
     .header-content h1{ font-size:28px; font-weight:bold; margin:0; }
     .header-content p{ font-size:14px; margin-top:5px; opacity:.9; }
 
+    /* ✅ أهم سطرين لتمدد الخريطة */
     .content{
       flex:1;
       display:flex;
@@ -210,6 +213,7 @@
 
     .no-results{ text-align:center; padding:20px; color:#999; font-size:13px; }
 
+    /* ====== FOOTER (نفس تصميمك) ====== */
     .footer{
       flex-shrink:0;
       background:#f0f0f0;
@@ -226,7 +230,7 @@
     .footer a{ color:#1a5f3f; text-decoration:none; font-weight:bold; }
     .footer a:hover{ text-decoration:underline; }
 
-  /*  الجوال: إحصائيات+فلاتر ثم الخريطة، بدون قائمة */
+  /* ✅ الجوال: إحصائيات+فلاتر ثم الخريطة، بدون قائمة */
     @media (max-width: 768px){
       body{ height:auto; overflow:auto; }
       .container{ overflow:visible; }
@@ -260,9 +264,9 @@
         <img src="logo.svg" alt="شعار جامعة الملك خالد">
       </div>
       <div class="header-content">
-        <!--  العنوان الأول -->
+        <!-- ✅ العنوان الأول -->
         <h1>الخارطة الاستثمارية للعقود الاستثمارية</h1>
-        <!--  العنوان الثاني -->
+        <!-- ✅ العنوان الثاني -->
         <p>خريطة تفاعلية لعرض المواقع والعقود المستثمرة</p>
       </div>
     </div>
@@ -301,7 +305,7 @@
         </div>
 
         <div class="filters">
-          <!--  فلتر الموقع = العمود O (الموقع حسب المصدر) -->
+          <!-- ✅ فلتر الموقع = العمود O (الموقع حسب المصدر) -->
           <div class="filter-group">
             <label for="filterSource">📍 الموقع:</label>
             <select id="filterSource">
@@ -309,7 +313,7 @@
             </select>
           </div>
 
-          <!--  فلتر المبنى = العمود P (المبنى) -->
+          <!-- ✅ فلتر المبنى = العمود P (المبنى) -->
           <div class="filter-group">
             <label for="filterBuilding">🏢 المبنى:</label>
             <select id="filterBuilding">
@@ -317,7 +321,7 @@
             </select>
           </div>
 
-          <!--  فلتر الحالة = العمود K (حالة العقد) -->
+          <!-- ✅ فلتر الحالة = العمود K (حالة العقد) -->
           <div class="filter-group">
             <label for="filterStatus">🧾 الحالة:</label>
             <select id="filterStatus">
@@ -368,7 +372,7 @@
       setTimeout(() => { if (map) map.invalidateSize(); }, 250);
     }
 
-    //  قراءة قيمة من أسماء أعمدة متعددة (للتوافق مع أي تغيّر بسيط)
+    // ✅ قراءة قيمة من أسماء أعمدة متعددة (للتوافق مع أي تغيّر بسيط)
     function getValue(details, keys) {
       if (!details) return '';
       for (const k of keys) {
@@ -385,7 +389,7 @@
       return Number.isFinite(n) ? String(n).padStart(3, '0') : s;
     }
 
-    //  تنسيق الأجرة السنوية: 
+    // ✅ تنسيق الأجرة السنوية: 16,500.00
     function formatCurrency(value) {
       if (value === null || value === undefined) return '';
       const s = value.toString().trim();
@@ -395,7 +399,7 @@
       return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    //  أيقونة حمراء للعقود المنتهية (الساري يبقى الافتراضي)
+    // 🔴 أيقونة حمراء للعقود المنتهية (الساري يبقى الافتراضي)
     const redIcon = new L.Icon({
       iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
@@ -405,7 +409,7 @@
       shadowSize: [41, 41]
     });
 
-    //  إحصائيات العقود (Unique): ساري/منتهي + عدد الصفوف
+    // ✅ إحصائيات العقود (Unique): ساري/منتهي + عدد الصفوف
     function updateContractStats(sites) {
       const statusByContract = new Map(); // contractId -> status
 
@@ -431,11 +435,11 @@
       document.getElementById('totalActive').textContent = active;
       document.getElementById('totalEnded').textContent = ended;
 
-      //  عدد الصفوف = كل السجلات حتى بدون إحداثيات
+      // ✅ عدد الصفوف = كل السجلات حتى بدون إحداثيات
       document.getElementById('totalLocations').textContent = sites.length;
     }
 
-    //  فلاتر حسب: O (الموقع حسب المصدر) و P (المبنى)
+    // ✅ فلاتر حسب: O (الموقع حسب المصدر) و P (المبنى)
     function populateFilters(sites) {
       const sources = new Set();
       const buildings = new Set();
@@ -529,7 +533,7 @@
       displaySites(filterSites(allSites));
     }
 
-    //  ترتيب البطاقة حسب طلبك + إخفاء بطاقات بدون إحداثيات من القائمة
+    // ✅ ترتيب البطاقة حسب طلبك + إخفاء بطاقات بدون إحداثيات من القائمة
     function displaySites(sites) {
       if (!map) initMap();
 
@@ -538,7 +542,7 @@
       const list = document.getElementById('locationsList');
       list.innerHTML = '';
 
-      //  إحصائيات حسب النتائج الحالية
+      // ✅ إحصائيات حسب النتائج الحالية
       updateContractStats(sites);
 
       if (!sites || sites.length === 0) {
@@ -565,7 +569,7 @@
           let popup = `<div style="direction: rtl; text-align: right; font-family: Tahoma, Arial, sans-serif;">`;
           popup += `<h4>${activity}</h4>`;
 
-          //  ترتيب المعلومات في الـ Popup حسب طلبك
+          // ✅ ترتيب المعلومات في الـ Popup حسب طلبك
           popup += `<p><strong>الموقع:</strong> ${siteVal || '<em style="color:#999;">غير محدد</em>'}</p>`;
           popup += `<p><strong>المبنى:</strong> ${buildingVal || '<em style="color:#999;">غير محدد</em>'}</p>`;
           popup += `<p><strong>المستثمر:</strong> ${investorVal || '<em style="color:#999;">غير محدد</em>'}</p>`;
@@ -582,7 +586,7 @@
           markers.push(marker);
         }
 
-        //  شرطك: لا نضيف بطاقة في القائمة إذا الإحداثيات غير متوفرة
+        // ✅ شرطك: لا نضيف بطاقة في القائمة إذا الإحداثيات غير متوفرة
         if (!validCoords) return;
 
         // ===== Sidebar card (Desktop) =====
@@ -590,7 +594,7 @@
         item.className = 'location-item';
 
         let html = `<h3>${activity}</h3>`;
-        //  ترتيب المعلومات في البطاقة حسب طلبك
+        // ✅ ترتيب المعلومات في البطاقة حسب طلبك
         html += `<p><strong>الموقع:</strong> ${siteVal || '<em style="color:#999;">غير محدد</em>'}</p>`;
         html += `<p><strong>المبنى:</strong> ${buildingVal || '<em style="color:#999;">غير محدد</em>'}</p>`;
         html += `<p><strong>المستثمر:</strong> ${investorVal || '<em style="color:#999;">غير محدد</em>'}</p>`;
@@ -621,7 +625,7 @@
       setTimeout(() => { if (map) map.invalidateSize(); }, 200);
     }
 
-    //  تثبيت البيانات بدون رفع: يقرأ sites.json
+    // ✅ تثبيت البيانات بدون رفع: يقرأ sites.json
     function loadData() {
       fetch('sites.json', { cache: 'no-store' })
         .then(res => {
